@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotional Healing Jar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.5s ease;
+            overflow-x: hidden;
+        }
+        
+        .title-font {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .jar-glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+        }
+        
+        .jar-lid {
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        .floating-delay {
+            animation: floating 6s ease-in-out infinite 2s;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .happiness-bg {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+        
+        .sadness-bg {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+        
+        .angriness-bg {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .quote-enter {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .number-selector::-webkit-inner-spin-button,
+        .number-selector::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .number-selector {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-500 happiness-bg">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none" id="particles-container"></div>
+    
+    <div class="max-w-4xl w-full flex flex-col items-center z-10">
+        <h1 class="title-font text-4xl md:text-5xl font-bold text-center text-white mb-2">Emotional Healing Jar</h1>
+        <p class="text-white/90 text-center mb-8">Pick your emotion and a number to receive a healing message</p>
+        
+        <div class="relative w-full max-w-md mb-8 sm:mb-12">
+            <div class="jar-glass w-full h-80 sm:h-96 rounded-2xl flex flex-col items-center justify-end pb-6 sm:pb-8 relative overflow-hidden">
+                <div class="absolute inset-0 flex items-center justify-center" id="quote-container">
+                    <p class="text-center text-white px-8 text-lg md:text-xl font-medium opacity-0" id="quote-text"></p>
+                </div>
+                
+                <div class="absolute bottom-0 left-0 right-0 h-16 bg-white/20 rounded-b-2xl"></div>
+                
+                <!-- Floating elements inside jar -->
+                <div class="absolute bottom-20 left-1/4 w-8 h-8 rounded-full bg-white/30 floating"></div>
+                <div class="absolute bottom-28 right-1/4 w-6 h-6 rounded-full bg-white/40 floating-delay"></div>
+                <div class="absolute bottom-40 left-1/3 w-5 h-5 rounded-full bg-white/20 floating"></div>
+            </div>
+            
+            <div class="jar-lid w-11/12 h-6 mx-auto rounded-full -mt-3 relative z-20"></div>
+            <div class="jar-lid w-4/5 h-4 mx-auto rounded-full -mt-1 relative z-10"></div>
+        </div>
+        
+        <div class="bg-white/20 backdrop-blur-md rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between mb-6">
+                <button class="emotion-btn happiness-btn px-4 py-2 rounded-lg font-medium text-white bg-yellow-500/90 hover:bg-yellow-500 transition-all" data-emotion="happiness">
+                    Happiness
+                </button>
+                <button class="emotion-btn sadness-btn px-4 py-2 rounded-lg font-medium text-white bg-blue-500/90 hover:bg-blue-500 transition-all" data-emotion="sadness">
+                    Sadness
+                </button>
+                <button class="emotion-btn angriness-btn px-4 py-2 rounded-lg font-medium text-white bg-red-500/90 hover:bg-red-500 transition-all" data-emotion="angriness">
+                    Angriness
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <label for="number-select" class="block text-white font-medium mb-2">Pick a number (1-50):</label>
+                <div class="relative">
+                    <input type="number" id="number-select" min="1" max="50" value="1" 
+                           class="number-selector w-full bg-white/30 border-none rounded-lg py-3 px-4 text-white placeholder-white/70 focus:ring-2 focus:ring-white/50 focus:outline-none">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="generate-btn" class="w-full bg-white/30 hover:bg-white/40 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Reveal Your Message
+            </button>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-white/70 text-sm text-center">
+        <p>Each message is carefully crafted to soothe your heart</p>
+    </div>
+
+    <script>
+        // Emotion quotes database
+        const quotes = {
+            happiness: [
+                "Joy is the simplest form of gratitude. Your happiness today is a gift to your future self.",
+                "Laughter is the sun that drives winter from the human face. Let your smile change the world today.",
+                "Happiness is not something ready-made. It comes from your own actions and the love you share.",
+                "The happiest people don't have the best of everything, they make the best of everything.",
+                "Your happiness is a masterpiece being painted one brushstroke at a time. Enjoy the process.",
+                "Gratitude turns what we have into enough. Count your blessings and watch them multiply.",
+                "Happiness is a warm conversation with someone who truly understands your heart.",
+                "Let your joy be contagious. The world needs more people who shine from within.",
+                "Today is a perfect day to be happy about the little things that make life beautiful.",
+                "Your happiness is like a garden - the more you tend to it, the more it flourishes.",
+                "Smile, breathe, and go slowly. Happiness is found in the present moment.",
+                "The secret of happiness is to admire without desiring. Find beauty in what already is.",
+                "Happiness is not in the absence of problems, but in the ability to dance in the rain.",
+                "Collect moments, not things. The best memories are made in the warmth of happiness.",
+                "Let your heart be light. Happiness grows best in soil that's free from worry.",
+                "Happiness is when what you think, what you say, and what you do are in harmony.",
+                "The fragrance of happiness lingers longest when shared with others.",
+                "Your happiness is a song only you can sing. Don't be afraid to let your voice be heard.",
+                "Joy is the echo of God's love in your heart. Let it resonate through your entire being.",
+                "Happiness is a choice you make every morning when you decide how to see the world.",
+                "The sun does not shine for a few trees and flowers, but for the wide world's joy. So does your happiness.",
+                "Let your happiness be as deep as the ocean and as constant as the northern star.",
+                "True happiness is like a butterfly - the more you chase it, the more it eludes you, but if you turn your attention to other things, it comes and sits softly on your shoulder.",
+                "Plant seeds of happiness in your daily life and watch your world bloom with joy.",
+                "Happiness is the art of never holding in your mind the memory of any unpleasant thing that has passed.",
+                "Your capacity for happiness is like a well - the deeper you dig, the more you find.",
+                "Joy is the infallible sign of the presence of God in your life. Let it shine through you.",
+                "Happiness is not about getting what you want, but appreciating what you have.",
+                "Let your happiness be as boundless as the sky and as refreshing as morning dew.",
+                "The happiest moments are those when we forget ourselves, usually in the service of others.",
+                "Happiness is a perfume you cannot pour on others without getting a few drops on yourself.",
+                "Your joy is a light that can brighten even the darkest corners of someone else's world.",
+                "True happiness consists not in the multitude of friends, but in their worth and choice.",
+                "Let your happiness be rooted in being, not in having. The deepest joy comes from within.",
+                "Happiness is like a kiss - you must share it to enjoy it fully.",
+                "The art of being happy lies in the power of extracting happiness from common things.",
+                "Your happiness is a treasure that increases when you give it away freely.",
+                "Joy is the quiet confidence that everything is unfolding exactly as it should.",
+                "Happiness grows at our own firesides, and is not to be picked in strangers' gardens.",
+                "Let your happiness be as natural as breathing and as constant as your heartbeat.",
+                "The greatest happiness you can have is knowing that you are loved for who you are.",
+                "Happiness is not a destination, but a manner of traveling through life.",
+                "Your joy is a sacred gift. Protect it, nurture it, and let it guide your way.",
+                "True happiness is to enjoy the present, without anxious dependence upon the future.",
+                "Let your happiness be like a river - constantly flowing and nourishing everything it touches.",
+                "Happiness is the spiritual experience of living every minute with love, grace, and gratitude.",
+                "Your capacity for joy is limitless. Don't put ceilings on your happiness.",
+                "The happiness of your life depends upon the quality of your thoughts. Choose them wisely.",
+                "Let your happiness be as spontaneous as laughter and as deep as the ocean.",
+                "Happiness is not having what you want, but wanting what you have. Cherish this moment."
+            ],
+            sadness: [
+                "Tears water the garden of the soul. Your sadness today will blossom into wisdom tomorrow.",
+                "It's okay to feel broken sometimes. Even mosaics are made from shattered pieces, and they're beautiful.",
+                "Sadness is just love that has nowhere to go right now. It means your heart still knows how to feel deeply.",
+                "The wound is the place where the light enters you. Your pain is not your enemy, but your teacher.",
+                "Healing is not about becoming who you were before, but about becoming who you were meant to be through the experience.",
+                "Your tears are sacred. They cleanse the soul just as rain cleanses the earth.",
+                "Sadness is the soul's way of saying this matters. Honor your feelings without letting them define you.",
+                "The night is darkest just before the dawn, but the dawn always comes. Hold on.",
+                "Grief is the price we pay for love. Your sadness is a testament to your capacity to care deeply.",
+                "Even in winter, the trees are quietly preparing for spring. So is your heart.",
+                "Your sadness is not a weakness, but a bridge to deeper understanding and compassion.",
+                "The heart that breaks open can contain the whole universe. Your pain is expanding your capacity for joy.",
+                "Tears are words the heart can't express. Let them flow when needed, then let them go.",
+                "You are not alone in your sadness. The moon understands, and still she shines.",
+                "Healing comes in waves. Some days the water is calm, some days it's rough. Both are part of the journey.",
+                "Your sadness is like a cloud passing over the sun - it may dim the light temporarily, but it cannot extinguish it.",
+                "The cracks in your heart are how the light gets in. Your brokenness is making space for new growth.",
+                "Sadness is the soul's way of processing change. Be gentle with yourself during transitions.",
+                "Even the most beautiful gardens need rain to grow. Your tears are nourishing something beautiful within you.",
+                "Your pain is not permanent, but the wisdom you gain from it will last a lifetime.",
+                "The heart that's being stretched by sadness will eventually expand to hold more joy.",
+                "Sadness is like the tide - it comes in waves, but it always recedes. You will breathe easy again.",
+                "Your tears are not a sign of defeat, but of your courage to feel deeply in a world that often numbs.",
+                "The most beautiful rainbows appear after the darkest storms. Your light will shine again.",
+                "Healing is not linear. Some days you'll take three steps forward and two steps back. All of it matters.",
+                "Your sadness is not a prison, but a cocoon. You are being transformed in ways you can't yet see.",
+                "Even in your darkest moments, you are still whole. The night sky is beautiful because of its darkness.",
+                "The weight you carry is making you stronger, even if you can't feel it yet. This too shall pass.",
+                "Your sadness is sacred ground where new wisdom is being planted. Trust the process.",
+                "Broken crayons still color. Your pain does not diminish your ability to create beauty in the world.",
+                "The heart that's being broken open is making room for more love than it ever imagined possible.",
+                "Your sadness is not a flaw, but a facet of your humanity. You are allowed to feel deeply.",
+                "Even the most beautiful songs have minor chords. Your sadness adds depth to your life's melody.",
+                "Healing happens in layers. Be patient with yourself as you peel them back one by one.",
+                "Your tears are liquid prayers. Let them carry your pain to a place of transformation.",
+                "The same wind that uproots trees makes the grasses bend gracefully. You're learning to bend without breaking.",
+                "Sadness is the soul's winter - a necessary season of rest before new growth emerges.",
+                "Your broken heart is not the end of your story, but the beginning of a new chapter.",
+                "Even in sadness, you are still you - complete, worthy, and deserving of love.",
+                "The pain you feel today is the strength you'll feel tomorrow. Every experience is preparing you.",
+                "Your sadness is not a wall, but a doorway to deeper understanding and compassion.",
+                "Like the moon, you go through phases. The dark phase doesn't mean the light is gone forever.",
+                "Healing begins when you stop comparing your insides to everyone else's outsides.",
+                "Your tears are the ink with which your soul writes its most profound poetry.",
+                "Even the longest night turns into day. Your dawn is coming, even if you can't see it yet.",
+                "Sadness carves out hollows in the soul where joy can later pool more deeply.",
+                "Your pain is not pointless. It's preparing you for something your soul needs to experience.",
+                "Like a tree in winter, you may feel bare, but life is quietly preparing to burst forth anew.",
+                "The heart that's being stretched by sadness will eventually know a joy proportional to its sorrow."
+            ],
+            angriness: [
+                "Anger is often just pain in disguise. What hurts beneath the surface?",
+                "Your anger is a signal, not a sentence. Listen to its message, then let it pass like a storm.",
+                "Fire can destroy or purify. Your anger holds the same potential - choose transformation.",
+                "The energy of anger can be redirected into passionate creation. What needs to be built?",
+                "Anger is the bodyguard of deeper emotions. What is it protecting in your heart?",
+                "Like a volcano, anger releases pressure. Find healthy ways to let the steam escape.",
+                "Your anger is valid, but your actions define you. Channel this energy wisely.",
+                "The hottest fires forge the strongest steel. Your anger can temper your character.",
+                "Anger is often the first step toward setting necessary boundaries. What needs protecting?",
+                "The same energy that fuels anger can fuel determination. Redirect your fire.",
+                "Your anger is a messenger asking to be heard, not a tyrant demanding control.",
+                "Like lightning, anger can be destructive or it can illuminate what needs to be seen.",
+                "The fire within you is sacred. Learn to tend it without letting it consume you.",
+                "Anger is energy in motion. Where can you direct this energy to create positive change?",
+                "Your passion is the flip side of your anger. Both speak to what matters deeply to you.",
+                "Like a thunderstorm, anger clears the air. What needs to be washed clean in your life?",
+                "The heat of anger can melt old patterns, making space for new ways of being.",
+                "Your anger is not your enemy, but a teacher showing you where your boundaries lie.",
+                "The warrior's strength comes not from uncontrolled rage, but from focused power.",
+                "Anger is often the body's way of saying 'no more.' What needs to change?",
+                "Like a forest fire, anger can destroy, but it also clears space for new growth.",
+                "Your fire is sacred. Learn to contain it, direct it, and use it wisely.",
+                "The energy behind anger is life force itself. Honor it by channeling it constructively.",
+                "Anger is often the mask worn by hurt. What tender place needs your attention?",
+                "Like a blacksmith's forge, your anger can shape you into something stronger.",
+                "Your passion and your anger come from the same source. One destroys, the other creates.",
+                "The heat you feel is transformation energy. What needs to be alchemized in your life?",
+                "Anger is power seeking direction. Where can you point this energy to make things better?",
+                "Like a river in flood, anger has force that can be harnessed for good.",
+                "Your anger is not wrong, but how you express it defines your character.",
+                "The fire within you can warm or burn. You get to choose how to use its power.",
+                "Anger is often the first step toward justice. What unfairness needs addressing?",
+                "Like a sword, anger can defend or attack. Wield your power with wisdom.",
+                "Your intensity is a gift when directed toward positive change.",
+                "The energy of anger is pure potential. It can build or destroy - the choice is yours.",
+                "Anger is the body's way of saying 'enough.' What boundaries need reinforcing?",
+                "Like a storm at sea, anger passes more quickly when you don't fight against it.",
+                "Your fire can light the way forward if you learn to control its burn.",
+                "The heat of anger can forge new understanding if you let it work for you.",
+                "Anger is often the outer layer of deeper feelings. What lies beneath?",
+                "Like a volcano, pressure needs release valves. Find healthy outlets for your energy.",
+                "Your anger shows you care deeply. Now channel that care into constructive action.",
+                "The same intensity that fuels rage can fuel remarkable achievements.",
+                "Anger is energy seeking transformation. What needs to change in your situation?",
+                "Like a wildfire, anger can clear away what no longer serves to make room for new growth.",
+                "Your passion is your power. Learn to express it without letting it control you.",
+                "The fire within you is sacred. Tend it with respect and it will serve you well.",
+                "Anger is often the first step toward healing, if you let it show you what needs attention.",
+                "Like a thunderstorm, anger can be fierce but it always passes. Breathe through it.",
+                "Your intensity is not your enemy. Learn its rhythms and you'll master its power."
+            ]
+        };
+
+        // DOM elements
+        const emotionBtns = document.querySelectorAll('.emotion-btn');
+        const numberInput = document.getElementById('number-select');
+        const generateBtn = document.getElementById('generate-btn');
+        const quoteText = document.getElementById('quote-text');
+        const body = document.body;
+        const particlesContainer = document.getElementById('particles-container');
+        
+        // Current emotion
+        let currentEmotion = 'happiness';
+        
+        // Set up event listeners
+        emotionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                emotionBtns.forEach(b => b.classList.remove('ring-2', 'ring-white', 'ring-offset-2'));
+                
+                // Add active class to clicked button
+                btn.classList.add('ring-2', 'ring-white', 'ring-offset-2');
+                
+                // Set current emotion
+                currentEmotion = btn.dataset.emotion;
+                
+                // Change background based on emotion
+                changeBackground(currentEmotion);
+                
+                // Create particles
+                createParticles(currentEmotion);
+            });
+        });
+        
+        // Generate quote button
+        generateBtn.addEventListener('click', () => {
+            const selectedNumber = parseInt(numberInput.value);
+            
+            // Validate number
+            if (isNaN(selectedNumber) || selectedNumber < 1 || selectedNumber > 50) {
+                alert('Please enter a number between 1 and 50');
+                return;
+            }
+            
+            // Get quote
+            const quote = quotes[currentEmotion][selectedNumber - 1];
+            
+            // Display quote with animation
+            displayQuote(quote);
+        });
+        
+        // Function to change background based on emotion
+        function changeBackground(emotion) {
+            body.classList.remove('happiness-bg', 'sadness-bg', 'angriness-bg');
+            
+            switch(emotion) {
+                case 'happiness':
+                    body.classList.add('happiness-bg');
+                    break;
+                case 'sadness':
+                    body.classList.add('sadness-bg');
+                    break;
+                case 'angriness':
+                    body.classList.add('angriness-bg');
+                    break;
+            }
+        }
+        
+        // Function to display quote with animation
+        function displayQuote(quote) {
+            // Reset animation
+            quoteText.classList.remove('quote-enter');
+            quoteText.style.opacity = '0';
+            
+            // Set text
+            quoteText.textContent = quote;
+            
+            // Trigger animation
+            setTimeout(() => {
+                quoteText.classList.add('quote-enter');
+                quoteText.style.opacity = '1';
+            }, 10);
+        }
+        
+        // Function to create particles
+        function createParticles(emotion) {
+            // Clear existing particles
+            particlesContainer.innerHTML = '';
+            
+            // Set particle color based on emotion
+            let particleColor;
+            switch(emotion) {
+                case 'happiness':
+                    particleColor = 'rgba(255, 215, 0, 0.6)';
+                    break;
+                case 'sadness':
+                    particleColor = 'rgba(100, 149, 237, 0.6)';
+                    break;
+                case 'angriness':
+                    particleColor = 'rgba(220, 20, 60, 0.6)';
+                    break;
+            }
+            
+            // Create particles
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 5 + 2;
+                const posX = Math.random() * window.innerWidth;
+                const posY = Math.random() * window.innerHeight;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 5;
+                const opacity = Math.random() * 0.5 + 0.3;
+                
+                // Apply styles
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}px`;
+                particle.style.top = `${posY}px`;
+                particle.style.backgroundColor = particleColor;
+                particle.style.animation = `floating ${duration}s ease-in-out infinite ${delay}s`;
+                particle.style.opacity = opacity;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Initialize
+        emotionBtns[0].classList.add('ring-2', 'ring-white', 'ring-offset-2');
+        createParticles(currentEmotion);
+        
+        // Random number button (hidden in UI but accessible for demo)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                numberInput.value = Math.floor(Math.random() * 50) + 1;
+            }
+        });
+    </script>
+</body>
+</html>
